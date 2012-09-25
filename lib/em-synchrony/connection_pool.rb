@@ -65,16 +65,16 @@ module EventMachine
         # data is available, or request is complete)
         #
         def method_missing(method, *args, &blk)
-#          async = (method[0,1] == "a")
+          async = (method[0,1] == "a")
 
           execute(async) do |conn|
             df = conn.__send__(method, *args, &blk)
 
-            #if async
-            #  fiber = Fiber.current
-            #  df.callback { release(fiber) }
-            #  df.errback { release(fiber) }
-            #end
+            if async
+              fiber = Fiber.current
+              df.callback { release(fiber) }
+              df.errback { release(fiber) }
+            end
 
             df
           end
